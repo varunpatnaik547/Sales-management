@@ -48,8 +48,7 @@ export default function Payouts() {
     setRef("");
     await load();
   }
-
-  return (
+return (
     <>
       <h2 className="mb-5 text-2xl font-bold">Pending payouts</h2>
 
