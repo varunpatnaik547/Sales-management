@@ -49,7 +49,12 @@ export default function Visits() {
         onSubmit={submit}
         className="max-w-xl space-y-4 rounded-xl border bg-white p-5"
       >
-        <select name="customer" required>
-          <option value="">Select customer</option>
-          {customers.map((customer) => (
-            <option key={customer.id} value={customer
+       <select name="customer" required>
+  <option value="">Select customer</option>
+
+  {customers.map((customer) => (
+    <option key={customer.id} value={customer.id}>
+      {customer.company_name}
+    </option>
+  ))}
+</select>
