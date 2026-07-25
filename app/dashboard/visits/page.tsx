@@ -57,15 +57,6 @@ export default function Visits() {
       {customer.company_name}
     </option>
   ))}
-<select name="customer" required>
-          <option value="">Select customer</option>
-          {customers.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.company_name}
-            </option>
-          ))}
-        </select>
-
         <textarea
           name="remark"
           placeholder="Remark"
