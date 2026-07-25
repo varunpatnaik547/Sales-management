@@ -57,6 +57,7 @@ export default function Visits() {
       {customer.company_name}
     </option>
   ))}
+     </select>    
         <textarea
           name="remark"
           placeholder="Remark"
