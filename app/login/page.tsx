@@ -1,3 +1,40 @@
-"use client";
-import { useState } from "react"; import { createClient } from "@/lib/supabase/client";
-export default function Login(){const [email,setEmail]=useState("");const [password,setPassword]=useState("");const [error,setError]=useState("");async function signIn(e:React.FormEvent){e.preventDefault();const {error}=await createClient().auth.signInWithPassword({email,password});if(error)setError(error.message);else location.href="/dashboard"}return <main className="grid min-h-screen place-items-center p-4"><form onSubmit={signIn} className="w-full max-w-sm space-y-4 rounded-xl border bg-white p-7 shadow-sm"><h1 className="text-2xl font-bold">SalesFlow</h1><p className="text-sm text-slate-500">Sign in to continue</p><input required type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)}/><input required type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)}/>{error&&<p className="text-sm text-red-600">{error}</p>}<button className="w-full bg-indigo-600 text-white">Sign in</button></form></main>}
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  if (user && request.nextUrl.pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  return response;
+}
+
+export const config = { matcher: ["/dashboard/:path*", "/login"] };
