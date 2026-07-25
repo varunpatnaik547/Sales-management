@@ -49,4 +49,40 @@ export default function Payouts() {
     await load();
   }
 
-  return
+  return (
+    <>
+      <h2 className="mb-5 text-2xl font-bold">Pending payouts</h2>
+
+      <div className="mb-4 flex gap-2">
+        <input
+          className="max-w-xs"
+          value={ref}
+          onChange={(e) => setRef(e.target.value)}
+          placeholder="Transaction reference"
+        />
+      </div>
+
+      <DataTable
+        rows={rows}
+        columns={[
+          { key: "expense_date", label: "Date" },
+          { key: "sales_rep", label: "Representative" },
+          { key: "type", label: "Type" },
+          { key: "approved_amount", label: "Approved" },
+        ]}
+      />
+
+      <div className="mt-3 space-y-2">
+        {rows.map((expense) => (
+          <button
+            className="mr-2 border bg-white"
+            key={String(expense.id)}
+            onClick={() => pay(String(expense.id))}
+          >
+            Mark {String(expense.id).slice(0, 8)} paid
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
