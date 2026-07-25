@@ -57,4 +57,39 @@ export default function Visits() {
       {customer.company_name}
     </option>
   ))}
-</select>
+<select name="customer" required>
+          <option value="">Select customer</option>
+          {customers.map((customer) => (
+            <option key={customer.id} value={customer.id}>
+              {customer.company_name}
+            </option>
+          ))}
+        </select>
+
+        <textarea
+          name="remark"
+          placeholder="Remark"
+          className="w-full rounded border p-2"
+          rows={3}
+        />
+
+        <input
+          type="date"
+          name="followup"
+          className="w-full rounded border p-2"
+        />
+
+        <input type="file" name="photo" accept="image/*" />
+
+        <button
+          type="submit"
+          className="rounded bg-black px-4 py-2 text-white"
+        >
+          Submit
+        </button>
+      </form>
+
+      {msg && <p className="mt-3 text-sm">{msg}</p>}
+    </>
+  );
+}
