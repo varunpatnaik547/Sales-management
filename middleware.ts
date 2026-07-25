@@ -10,23 +10,16 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-
         setAll: (
-          cookiesToSet: {
-            name: string;
-            value: string;
-            options: CookieOptions;
-          }[]
+          cookiesToSet: { name: string; value: string; options: CookieOptions }[]
         ) => {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
           response = NextResponse.next({ request });
-
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
@@ -39,10 +32,11 @@ export async function middleware(request: NextRequest) {
   if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+  if (user && request.nextUrl.pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
   return response;
 }
 
-export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
-};
+export const config = { matcher: ["/dashboard/:path*", "/login"] };
