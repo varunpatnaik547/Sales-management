@@ -10,6 +10,7 @@ export default function Expenses() {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     const f = new FormData(e.currentTarget);
     const file = f.get("receipt") as File;
     const receipt_path = file?.size ? await uploadFile(file, "receipts") : null;
@@ -33,7 +34,7 @@ export default function Expenses() {
     });
 
     setMessage(error?.message || "Expense submitted; approved amount was calculated.");
-    if (!error) e.currentTarget.reset();
+    if (!error) form.reset();
   }
 
   return (
