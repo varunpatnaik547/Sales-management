@@ -10,7 +10,7 @@ export default function Expenses() {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);   
+    const f = new FormData(e.currentTarget);
     const file = f.get("receipt") as File;
     const receipt_path = file?.size ? await uploadFile(file, "receipts") : null;
 

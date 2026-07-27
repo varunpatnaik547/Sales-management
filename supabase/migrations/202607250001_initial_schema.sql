@@ -40,5 +40,9 @@ create policy "products read" on products for select using (true); create policy
 create policy "orders" on orders for all using (public.is_role('admin') or public.is_role('finance') or sales_rep_id=auth.uid()) with check (public.is_role('admin') or sales_rep_id=auth.uid()); create policy "order items" on order_items for all using (exists(select 1 from orders where orders.id=order_id and (orders.sales_rep_id=auth.uid() or public.is_role('admin') or public.is_role('finance')))) with check (exists(select 1 from orders where orders.id=order_id and (orders.sales_rep_id=auth.uid() or public.is_role('admin'))));
 create policy "expenses read" on expenses for select using (public.is_role('admin') or public.is_role('finance') or sales_rep_id=auth.uid()); create policy "expenses create" on expenses for insert with check (sales_rep_id=auth.uid()); create policy "expenses finance" on expenses for update using (public.is_role('finance') or public.is_role('admin'));
 insert into storage.buckets (id,name,public) values ('sales-files','sales-files',false) on conflict do nothing;
+<<<<<<< HEAD
 create policy "sales files" on storage.objects for all using (bucket_id='sales-files' and (owner_id=auth.uid() or public.is_role('admin') or public.is_role('finance'))) with check(bucket_id='sales-files' and owner_id=auth.uid());
 z
+=======
+create policy "sales files" on storage.objects for all using (bucket_id='sales-files' and (owner_id = auth.uid()::text or public.is_role('admin') or public.is_role('finance'))) with check(bucket_id='sales-files' andowner_id = auth.uid()::text;
+>>>>>>> 083bd3b8bb158b851843d9666aeb8e70a0219200
