@@ -1,4 +1,56 @@
 "use client";
-import { useState } from "react"; import { createClient } from "@/lib/supabase/client"; import { uploadFile } from "@/components/upload";
-const types=["food","hotel","bus","train","bike_fuel","car_fuel","other"];
-export default function Expenses(){const [message,setMessage]=useState("");async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const file=f.get("receipt") as File;const receipt_path=file?.size?await uploadFile(file,"receipts"):null;const {error}=await createClient().from("expenses").insert({expense_date:f.get("date"),type:f.get("type"),amount_claimed:Number(f.get("amount")),working_location:f.get("location"),remark:f.get("remark"),receipt_path});setMessage(error?.message||"Expense submitted; approved amount was calculated.");if(!error)e.currentTarget.reset()}return <><h2 className="mb-5 text-2xl font-bold">New expense</h2><form onSubmit={submit} className="max-w-xl space-y-4 rounded-xl border bg-white p-5"><input name="date" type="date" required/><select name="type">{types.map(x=><option key={x}>{x.replace("_"," ")}</option>)}</select><input name="amount" type="number" min="0" step="0.01" placeholder="Amount claimed" required/><input name="location" placeholder="Today's working location" required/><input name="receipt" type="file" accept="image/*,application/pdf"/><textarea name="remark" placeholder="Remark"/><button className="bg-indigo-600 text-white">Submit expense</button>{message&&<p className="text-sm">{message}</p>}</form></>}
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { uploadFile } from "@/components/upload";
+
+const types = ["food", "hotel", "bus", "train", "bike_fuel", "car_fuel", "other"];
+
+export default function Expenses() {
+  const [message, setMessage] = useState("");
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);   
+    const file = f.get("receipt") as File;
+    const receipt_path = file?.size ? await uploadFile(file, "receipts") : null;
+
+    const db = createClient();
+    const { data: { user } } = await db.auth.getUser();
+
+    if (!user) {
+      setMessage("You are not logged in.");
+      return;
+    }
+
+    const { error } = await db.from("expenses").insert({
+      sales_rep_id: user.id,
+      expense_date: f.get("date"),
+      type: f.get("type"),
+      amount_claimed: Number(f.get("amount")),
+      working_location: f.get("location"),
+      remark: f.get("remark"),
+      receipt_path,
+    });
+
+    setMessage(error?.message || "Expense submitted; approved amount was calculated.");
+    if (!error) e.currentTarget.reset();
+  }
+
+  return (
+    <>
+      <h2 className="mb-5 text-2xl font-bold">New expense</h2>
+      <form onSubmit={submit} className="max-w-xl space-y-4 rounded-xl border bg-white p-5">
+        <input name="date" type="date" required />
+        <select name="type">
+          {types.map((x) => <option key={x}>{x.replace("_", " ")}</option>)}
+        </select>
+        <input name="amount" type="number" min="0" step="0.01" placeholder="Amount claimed" required />
+        <input name="location" placeholder="Today's working location" required />
+        <input name="receipt" type="file" accept="image/*,application/pdf" />
+        <textarea name="remark" placeholder="Remark" />
+        <button className="bg-indigo-600 text-white">Submit expense</button>
+        {message && <p className="text-sm">{message}</p>}
+      </form>
+    </>
+  );
+}
